@@ -11,6 +11,7 @@ else
 fi
 
 MAX_GUESSES=10
+SCORES_FILE="${HOME}/.numberguess_scores"
 
 get_stars() {
     local n=$1
@@ -26,6 +27,32 @@ get_stars() {
     for (( i=0; i<count; i++ ));      do filled+="★"; done
     for (( i=count; i<5; i++ ));      do empty+="☆";  done
     echo "$filled$empty ($count/5)"
+}
+
+save_score() {
+    local name=$1 diff=$2 score=$3
+    local key="$name|$diff"
+    local tmp
+    tmp=$(mktemp)
+    local updated=0
+    if [[ -f "$SCORES_FILE" ]]; then
+        while IFS='|' read -r n d s; do
+            if [[ "$n|$d" == "$key" ]]; then
+                if [[ $score -lt $s ]]; then
+                    echo "$n|$d|$score"
+                else
+                    echo "$n|$d|$s"
+                fi
+                updated=1
+            else
+                echo "$n|$d|$s"
+            fi
+        done < "$SCORES_FILE" > "$tmp"
+    fi
+    if [[ $updated -eq 0 ]]; then
+        echo "$name|$diff|$score" >> "$tmp"
+    fi
+    mv "$tmp" "$SCORES_FILE"
 }
 
 echo "================================"
@@ -94,6 +121,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
         echo "${GREEN}*** YOU WIN! ***${RESET}"
         echo "${GREEN}Well done, $PLAYER_NAME! You guessed $SECRET in $guesses guess(es)! [$DIFFICULTY]${RESET}"
         echo "${GREEN}Rating: $(get_stars "$guesses")${RESET}"
+        save_score "$PLAYER_NAME" "$DIFFICULTY" "$guesses"
         exit 0
     fi
     echo "${DIM}  $remaining guess(es) remaining.${RESET}"
