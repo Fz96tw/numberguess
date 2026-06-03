@@ -4,9 +4,10 @@ if [[ -t 1 ]] && tput colors &>/dev/null && [[ $(tput colors) -ge 8 ]]; then
     RED=$(tput setaf 1)
     BLUE=$(tput setaf 4)
     GREEN=$(tput setaf 2)
+    DIM=$(tput dim 2>/dev/null || true)
     RESET=$(tput sgr0)
 else
-    RED=""; BLUE=""; GREEN=""; RESET=""
+    RED=""; BLUE=""; GREEN=""; DIM=""; RESET=""
 fi
 
 MAX_GUESSES=10
@@ -61,6 +62,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
 
     (( guesses++ ))
 
+    remaining=$(( MAX_GUESSES - guesses ))
     if [[ $guess -lt $SECRET ]]; then
         echo "${BLUE}Too low! Try higher.${RESET}"
     elif [[ $guess -gt $SECRET ]]; then
@@ -71,6 +73,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
         echo "${GREEN}You guessed $SECRET correctly in $guesses guess(es)! [$DIFFICULTY]${RESET}"
         exit 0
     fi
+    echo "${DIM}  $remaining guess(es) remaining.${RESET}"
     echo ""
 done
 
