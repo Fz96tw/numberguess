@@ -245,11 +245,13 @@ show_msg() {
 }
 
 get_input() {
-    local prompt=$1
-    tput cup $INPUT_ROW 2; tput el
-    printf "%s" "$prompt"
-    local val
-    read -r val
+    local prompt=$1 val
+    # All tput/printf output to /dev/tty so command substitution $() captures
+    # only the clean value from echo, not the escape sequences.
+    tput cup $INPUT_ROW 2 >/dev/tty
+    tput el >/dev/tty
+    printf "%s" "$prompt" >/dev/tty
+    read -r val </dev/tty
     echo "$val"
 }
 
