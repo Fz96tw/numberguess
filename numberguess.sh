@@ -12,6 +12,22 @@ fi
 
 MAX_GUESSES=10
 
+get_stars() {
+    local n=$1
+    local count
+    if   [[ $n -le 2 ]]; then count=5
+    elif [[ $n -le 4 ]]; then count=4
+    elif [[ $n -le 6 ]]; then count=3
+    elif [[ $n -le 8 ]]; then count=2
+    else                       count=1
+    fi
+    local filled="" empty=""
+    local i
+    for (( i=0; i<count; i++ ));      do filled+="★"; done
+    for (( i=count; i<5; i++ ));      do empty+="☆";  done
+    echo "$filled$empty ($count/5)"
+}
+
 echo "================================"
 echo "  NUMBER GUESSING GAME"
 echo "================================"
@@ -71,6 +87,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
         echo ""
         echo "${GREEN}*** YOU WIN! ***${RESET}"
         echo "${GREEN}You guessed $SECRET correctly in $guesses guess(es)! [$DIFFICULTY]${RESET}"
+        echo "${GREEN}Rating: $(get_stars "$guesses")${RESET}"
         exit 0
     fi
     echo "${DIM}  $remaining guess(es) remaining.${RESET}"
@@ -80,3 +97,4 @@ done
 echo ""
 echo "*** GAME OVER ***"
 echo "Out of guesses! The number was $SECRET."
+echo "Rating: ☆☆☆☆☆ (0/5)"
