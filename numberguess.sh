@@ -46,6 +46,29 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# ── Win screen ───────────────────────────────────────────────────────────────
+
+show_win_screen() {
+    local player=$1 guesses=$2
+    tput clear 2>/dev/null || printf '\033[2J\033[H'
+    echo ""
+    echo "${GREEN}${BOLD}"
+    echo "  ██╗   ██╗ ██████╗ ██╗   ██╗    ██╗    ██╗██╗███╗   ██╗██╗"
+    echo "  ╚██╗ ██╔╝██╔═══██╗██║   ██║    ██║    ██║██║████╗  ██║██║"
+    echo "   ╚████╔╝ ██║   ██║██║   ██║    ██║ █╗ ██║██║██╔██╗ ██║██║"
+    echo "    ╚██╔╝  ██║   ██║██║   ██║    ██║███╗██║██║██║╚██╗██║╚═╝"
+    echo "     ██║   ╚██████╔╝╚██████╔╝    ╚███╔███╔╝██║██║ ╚████║██╗"
+    echo "     ╚═╝    ╚═════╝  ╚═════╝      ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═╝"
+    echo "${RESET}"
+    echo ""
+    echo "${GREEN}        🎉  Well done, ${BOLD}$player${RESET}${GREEN}!  🎉${RESET}"
+    echo ""
+    echo "${YELLOW}        Rating:  $(get_stars "$guesses")${RESET}"
+    echo "${DIM}        Guessed the number in $guesses guess(es).${RESET}"
+    echo ""
+    sleep 2
+}
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 get_stars() {
@@ -248,14 +271,12 @@ play_game() {
             else
                 add_history "${GREEN}#$guesses${RESET}  $guess  →  ✓ Correct!${RESET}"
                 update_info "0"
-                show_msg "${GREEN}*** YOU WIN! ***  Rating: $(get_stars "$guesses")${RESET}"
+                show_msg "${GREEN}*** YOU WIN! ***  Press any key...${RESET}"
                 tput cup $INPUT_ROW 2; tput el
                 save_score "$PLAYER_NAME" "$DIFFICULTY" "$guesses"
                 tput cup 23 0
                 tput cnorm 2>/dev/null || true
-                echo ""
-                echo "${GREEN}Well done, $PLAYER_NAME! Guessed $SECRET in $guesses guess(es)! [$DIFFICULTY]${RESET}"
-                echo "${GREEN}Rating: $(get_stars "$guesses")${RESET}"
+                show_win_screen "$PLAYER_NAME" "$guesses"
                 show_leaderboard
                 return
             fi
@@ -296,10 +317,8 @@ play_game() {
             elif [[ $guess -gt $SECRET ]]; then
                 echo "${RED}Too high! Try lower.${RESET}"
             else
-                echo ""; echo "${GREEN}*** YOU WIN! ***${RESET}"
-                echo "${GREEN}Well done, $PLAYER_NAME! Guessed $SECRET in $guesses guess(es)! [$DIFFICULTY]${RESET}"
-                echo "${GREEN}Rating: $(get_stars "$guesses")${RESET}"
                 save_score "$PLAYER_NAME" "$DIFFICULTY" "$guesses"
+                show_win_screen "$PLAYER_NAME" "$guesses"
                 show_leaderboard; return
             fi
             echo "${DIM}  $remaining guess(es) remaining.${RESET}"; echo ""
