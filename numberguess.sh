@@ -1,19 +1,44 @@
 #!/usr/bin/env bash
 
 MAX_GUESSES=10
-SECRET=$(( RANDOM % 100 + 1 ))
-guesses=0
 
 echo "================================"
 echo "  NUMBER GUESSING GAME"
-echo "  Guess a number between 1 and 100"
+echo "================================"
+echo ""
+echo "Select difficulty:"
+echo "  1) Easy   (1 - 50)"
+echo "  2) Medium (1 - 100)"
+echo "  3) Hard   (1 - 200)"
+echo ""
+
+while true; do
+    echo -n "Enter choice [1-3]: "
+    if ! read -r choice; then
+        echo ""
+        exit 1
+    fi
+    case $choice in
+        1) DIFFICULTY="Easy";   MAX_NUM=50;  break ;;
+        2) DIFFICULTY="Medium"; MAX_NUM=100; break ;;
+        3) DIFFICULTY="Hard";   MAX_NUM=200; break ;;
+        *) echo "Invalid choice. Please enter 1, 2, or 3." ;;
+    esac
+done
+
+SECRET=$(( RANDOM % MAX_NUM + 1 ))
+guesses=0
+
+echo ""
+echo "================================"
+echo "  Difficulty: $DIFFICULTY (1 - $MAX_NUM)"
 echo "  You have $MAX_GUESSES guesses."
 echo "================================"
 echo ""
 
 while [[ $guesses -lt $MAX_GUESSES ]]; do
     remaining=$(( MAX_GUESSES - guesses ))
-    echo -n "Guess ($remaining left): "
+    echo -n "[$DIFFICULTY] Guess ($remaining left): "
     if ! read -r guess; then
         echo ""
         break
@@ -34,7 +59,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
     else
         echo ""
         echo "*** YOU WIN! ***"
-        echo "You guessed $SECRET correctly in $guesses guess(es)!"
+        echo "You guessed $SECRET correctly in $guesses guess(es)! [$DIFFICULTY]"
         exit 0
     fi
     echo ""
