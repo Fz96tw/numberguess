@@ -32,6 +32,12 @@ echo "================================"
 echo "  NUMBER GUESSING GAME"
 echo "================================"
 echo ""
+echo -n "Enter your name: "
+read -r PLAYER_NAME || true
+PLAYER_NAME="${PLAYER_NAME//[[:space:]]/}"
+PLAYER_NAME="${PLAYER_NAME:-Player}"
+echo ""
+
 echo "Select difficulty:"
 echo "  1) Easy   (1 - 50)"
 echo "  2) Medium (1 - 100)"
@@ -86,7 +92,7 @@ while [[ $guesses -lt $MAX_GUESSES ]]; do
     else
         echo ""
         echo "${GREEN}*** YOU WIN! ***${RESET}"
-        echo "${GREEN}You guessed $SECRET correctly in $guesses guess(es)! [$DIFFICULTY]${RESET}"
+        echo "${GREEN}Well done, $PLAYER_NAME! You guessed $SECRET in $guesses guess(es)! [$DIFFICULTY]${RESET}"
         echo "${GREEN}Rating: $(get_stars "$guesses")${RESET}"
         exit 0
     fi
@@ -96,5 +102,5 @@ done
 
 echo ""
 echo "*** GAME OVER ***"
-echo "Out of guesses! The number was $SECRET."
+echo "Hard luck, $PLAYER_NAME! The number was $SECRET."
 echo "Rating: ☆☆☆☆☆ (0/5)"
